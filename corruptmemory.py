@@ -11,26 +11,38 @@ corrupted_memory = """
 
 #pattern = r"mul\((\d{1,3}),(\d{1,3})\)"
 
+import re
 
-mul_pattern = r"mul\((\d{1,3}),(\d{1,3})\)"
-control_pattern= r"do\(\)|don't\(\)"
+# Entrada de memoria corrupta
+corrupted_memory = """
+xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
+"""
 
+# Patrones de expresiones regulares
+mul_pattern = r"mul\((\d{1,3}),(\d{1,3})\)"  # Coincide con mul(X,Y)
+control_pattern = r"do\(\)|don't\(\)"  # Coincide con do() y don't()
+
+# Dividir la entrada en tokens
 tokens = re.split(r"(mul\(\d{1,3},\d{1,3}\)|do\(\)|don't\(\))", corrupted_memory)
 
-enabled = True
+# Inicializar estado y suma
+enabled = True  # Los mul están habilitados por defecto
 result_sum = 0
 
+# Procesar cada token
 for token in tokens:
-    token = token.strip()
-    if re.match(mul_pattern, token):
-        if enabled:
-            x,y = map(int, re.findall(r"\d+",token))
+    token = token.strip()  # Eliminar espacios en blanco
+    if re.match(mul_pattern, token):  # Verificar si es un mul(X,Y) válido
+        if enabled:  # Solo sumar si está habilitado
+            x, y = map(int, re.findall(r"\d+", token))
             result_sum += x * y
-        elif token == "do()":
-            enabled = True
-        elif token == "don't()":
-            enabled = False 
-print(result_sum)
+    elif token == "do()":
+        enabled = True  # Habilitar futuros mul
+    elif token == "don't()":
+        enabled = False  # Deshabilitar futuros mul
+
+print("Suma de los resultados:", result_sum)
+
 
 #matches = re.findall(pattern, corrupted_memory)
 
