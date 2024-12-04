@@ -3,7 +3,7 @@ def count_xmas(grid):
     cols = len(grid[0])
     xmas_count = 0
 
-    # Verifica si hay un "MAS" en una dirección específica
+    # Función para verificar un patrón "MAS" en una dirección
     def is_mas(row, col, dr, dc):
         return (0 <= row + 2 * dr < rows and
                 0 <= col + 2 * dc < cols and
@@ -11,20 +11,27 @@ def count_xmas(grid):
                 grid[row + dr][col + dc] == 'A' and
                 grid[row + 2 * dr][col + 2 * dc] == 'S')
 
-    # Busca patrones "X-MAS"
+    # Recorremos el grid para detectar patrones "X-MAS"
     for row in range(rows):
         for col in range(cols):
-            # Verifica si el centro de la "X" es válido
+            # Verificamos si el centro de la "X" es válido
             if grid[row][col] == 'A':
-                # Verifica las diagonales que forman la "X"
-                if (is_mas(row - 1, col - 1, -1, -1) and is_mas(row + 1, col + 1, 1, 1)) or \
-                   (is_mas(row - 1, col + 1, -1, 1) and is_mas(row + 1, col - 1, 1, -1)):
+                # Verificamos las dos diagonales que forman la "X"
+                top_left = is_mas(row - 1, col - 1, -1, -1)
+                bottom_right = is_mas(row + 1, col + 1, 1, 1)
+                top_right = is_mas(row - 1, col + 1, -1, 1)
+                bottom_left = is_mas(row + 1, col - 1, 1, -1)
+
+                # Una "X-MAS" se forma si ambas diagonales están presentes
+                if top_left and bottom_right:
+                    xmas_count += 1
+                if top_right and bottom_left:
                     xmas_count += 1
 
     return xmas_count
 
 
-# Entrada de ejemplo
+# Entrada del grid
 grid = [
     ".M.S......",
     "..A..MSMS.",
@@ -38,9 +45,9 @@ grid = [
     ".........."
 ]
 
-# Convierte caracteres irrelevantes a puntos para facilitar el procesamiento
+# Limpiamos el grid para procesar solo caracteres relevantes
 processed_grid = [[ch if ch in "MAS" else '.' for ch in row] for row in grid]
 
-# Cuenta el número de patrones "X-MAS"
+# Calculamos el número de patrones "X-MAS"
 result = count_xmas(processed_grid)
 print(f"Número de patrones X-MAS: {result}")
