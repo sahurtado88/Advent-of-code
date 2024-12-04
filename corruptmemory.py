@@ -11,12 +11,6 @@ corrupted_memory = """
 
 #pattern = r"mul\((\d{1,3}),(\d{1,3})\)"
 
-import re
-
-# Entrada de memoria corrupta
-corrupted_memory = """
-xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))
-"""
 
 # Patrones de expresiones regulares
 mul_pattern = r"mul\((\d{1,3}),(\d{1,3})\)"  # Coincide con mul(X,Y)
