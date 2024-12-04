@@ -3,7 +3,7 @@ def count_xmas(grid):
     cols = len(grid[0])
     xmas_count = 0
 
-    # Función para verificar un patrón "MAS" en una dirección
+    # Función para verificar un "MAS" en una dirección específica
     def is_mas(row, col, dr, dc):
         return (0 <= row + 2 * dr < rows and
                 0 <= col + 2 * dc < cols and
@@ -11,18 +11,18 @@ def count_xmas(grid):
                 grid[row + dr][col + dc] == 'A' and
                 grid[row + 2 * dr][col + 2 * dc] == 'S')
 
-    # Recorremos el grid para detectar patrones "X-MAS"
+    # Busca patrones "X-MAS"
     for row in range(rows):
         for col in range(cols):
-            # Verificamos si el centro de la "X" es válido
+            # Centro de la "X" debe ser una "A"
             if grid[row][col] == 'A':
-                # Verificamos las dos diagonales que forman la "X"
+                # Verificar dos diagonales que formen la "X"
                 top_left = is_mas(row - 1, col - 1, -1, -1)
                 bottom_right = is_mas(row + 1, col + 1, 1, 1)
                 top_right = is_mas(row - 1, col + 1, -1, 1)
                 bottom_left = is_mas(row + 1, col - 1, 1, -1)
 
-                # Una "X-MAS" se forma si ambas diagonales están presentes
+                # Suma una "X-MAS" por cada diagonal válida
                 if top_left and bottom_right:
                     xmas_count += 1
                 if top_right and bottom_left:
@@ -31,7 +31,7 @@ def count_xmas(grid):
     return xmas_count
 
 
-# Entrada del grid
+# Grid de entrada
 grid = [
     ".M.S......",
     "..A..MSMS.",
@@ -45,9 +45,9 @@ grid = [
     ".........."
 ]
 
-# Limpiamos el grid para procesar solo caracteres relevantes
+# Convierte caracteres irrelevantes en '.'
 processed_grid = [[ch if ch in "MAS" else '.' for ch in row] for row in grid]
 
-# Calculamos el número de patrones "X-MAS"
+# Cuenta los patrones "X-MAS"
 result = count_xmas(processed_grid)
 print(f"Número de patrones X-MAS: {result}")
