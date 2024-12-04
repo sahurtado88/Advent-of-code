@@ -15,7 +15,7 @@ grid = [
 # Función para verificar si en una posición (i, j) se puede formar el patrón X-MAS
 def is_xmas(i, j, grid):
     if (i - 1 >= 0 and i + 1 < len(grid)) and (j - 1 >= 0 and j + 1 < len(grid[0])):
-        # Verificar el patrón M.S en las posiciones
+        # Verificar el patrón en forma de X
         if grid[i-1][j-1] == 'M' and grid[i][j] == 'A' and grid[i+1][j+1] == 'M':
             if grid[i-1][j+1] == 'S' and grid[i][j+1] == 'S' and grid[i+1][j-1] == 'S':
                 return True
