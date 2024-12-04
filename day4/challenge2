@@ -14,15 +14,12 @@ grid = [
 
 # Función para verificar si en una posición (i, j) se puede formar el patrón X-MAS
 def is_xmas(i, j, grid):
-    # Verificar si las posiciones alrededor de (i, j) tienen el patrón X-MAS
-    if i-1 >= 0 and i+1 < len(grid) and j-1 >= 0 and j+1 < len(grid[0]):
-        # Comprobamos el patrón en forma de X
-        # M.S
-        # .A.
-        # M.S
-        if grid[i-1][j-1] == 'M' and grid[i][j] == 'A' and grid[i+1][j+1] == 'M':
-            if grid[i-1][j+1] == 'S' and grid[i][j+1] == 'S' and grid[i+1][j-1] == 'S':
-                return True
+    # Comprobar las posiciones alrededor de (i, j) para ver si forman "X-MAS"
+    if i - 1 >= 0 and i + 1 < len(grid) and j - 1 >= 0 and j + 1 < len(grid[0]):
+        # Comprobamos que las posiciones relativas formen el patrón X-MAS
+        if (grid[i-1][j-1] == 'M' and grid[i][j] == 'A' and grid[i+1][j+1] == 'M' and
+            grid[i-1][j+1] == 'S' and grid[i][j+1] == 'S' and grid[i+1][j-1] == 'S'):
+            return True
     return False
 
 # Contar cuántas veces aparece el patrón "X-MAS"
