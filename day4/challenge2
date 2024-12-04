@@ -13,22 +13,22 @@ grid = [
 ]
 
 # Función para verificar si en una posición (i, j) se puede formar el patrón X-MAS
-def is_xmas(i, j, grid):
-    # Asegurarnos de que las posiciones alrededor de (i, j) estén dentro de la cuadrícula
-    if i - 1 >= 0 and i + 1 < len(grid) and j - 1 >= 0 and j + 1 < len(grid[0]):
-        # Verificar las posiciones relativas para formar el patrón X-MAS
+def check_xmas(i, j, grid):
+    # Verificamos que las posiciones alrededor de (i, j) formen el patrón X-MAS
+    if (i-1 >= 0 and i+1 < len(grid) and j-1 >= 0 and j+1 < len(grid[0])):
+        # Verificamos las posiciones para ver si forman la 'X' con 'M', 'A', 'S' en las posiciones correctas
         if (grid[i-1][j-1] == 'M' and grid[i][j] == 'A' and grid[i+1][j+1] == 'M' and
             grid[i-1][j+1] == 'S' and grid[i][j+1] == 'S' and grid[i+1][j-1] == 'S'):
             return True
     return False
 
-# Contar cuántas veces aparece el patrón "X-MAS"
+# Contar cuántas veces aparece el patrón X-MAS
 count = 0
 
 # Recorrer toda la cuadrícula buscando el patrón X-MAS
-for i in range(1, len(grid) - 1):  # Evitar los bordes
-    for j in range(1, len(grid[i]) - 1):  # Lo mismo para las columnas
-        if is_xmas(i, j, grid):
+for i in range(1, len(grid) - 1):  # Iniciar desde 1 para evitar el borde superior
+    for j in range(1, len(grid[i]) - 1):  # Lo mismo para las columnas, evitando el borde derecho
+        if check_xmas(i, j, grid):
             count += 1
 
 print(f"El patrón X-MAS aparece {count} veces.")
