@@ -1,0 +1,54 @@
+def count_xmas_occurrences(grid):
+    def find_word(x, y, dx, dy):
+        """
+        Check if "XMAS" exists starting at (x, y) in direction (dx, dy).
+        """
+        word = "XMAS"
+        for i in range(len(word)):
+            nx, ny = x + i * dx, y + i * dy
+            if not (0 <= nx < len(grid) and 0 <= ny < len(grid[0])):
+                return False
+            if grid[nx][ny] != word[i]:
+                return False
+        return True
+
+    directions = [
+        (0, 1),    # Right
+        (1, 0),    # Down
+        (1, 1),    # Down-right diagonal
+        (1, -1),   # Down-left diagonal
+        (0, -1),   # Left
+        (-1, 0),   # Up
+        (-1, -1),  # Up-left diagonal
+        (-1, 1)    # Up-right diagonal
+    ]
+
+    count = 0
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            for dx, dy in directions:
+                if find_word(i, j, dx, dy):
+                    count += 1
+
+    return count
+
+# Example grid
+grid = [
+    "MMMSXXMASM",
+    "MSAMXMSMSA",
+    "AMXSXMAAMM",
+    "MSAMASMSMX",
+    "XMASAMXAMM",
+    "XXAMMXXAMA",
+    "SMSMSASXSS",
+    "SAXAMASAAA",
+    "MAMMMXMMMM",
+    "MXMXAXMASX"
+]
+
+# Convert grid to a list of lists
+grid = [list(row) for row in grid]
+
+# Count occurrences of "XMAS"
+result = count_xmas_occurrences(grid)
+print(f"The word 'XMAS' appears {result} times in the grid.")
