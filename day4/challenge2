@@ -1,0 +1,57 @@
+def count_xmas_shapes(grid):
+    def is_xmas(x, y):
+        """
+        Check if an X-MAS shape exists centered at (x, y).
+        """
+        patterns = [
+            # Original X-MAS
+            ((-1, -1), (1, 1)),  # Top-left M, Bottom-right S
+            ((1, -1), (-1, 1)),  # Bottom-left M, Top-right S
+            # Mirrored X-MAS
+            ((-1, -1), (1, 1)),  # Top-left S, Bottom-right M
+            ((1, -1), (-1, 1)),  # Bottom-left S, Top-right M
+        ]
+        center = grid[x][y]  # Center should be 'A'
+        if center != 'A':
+            return False
+
+        for (dx1, dy1), (dx2, dy2) in patterns:
+            x1, y1 = x + dx1, y + dy1
+            x2, y2 = x + dx2, y + dy2
+            if 0 <= x1 < len(grid) and 0 <= y1 < len(grid[0]) and \
+               0 <= x2 < len(grid) and 0 <= y2 < len(grid[0]):
+                if (grid[x1][y1] == 'M' and grid[x2][y2] == 'S') or \
+                   (grid[x1][y1] == 'S' and grid[x2][y2] == 'M'):
+                    return True
+
+        return False
+
+    count = 0
+    for i in range(1, len(grid) - 1):
+        for j in range(1, len(grid[0]) - 1):
+            if is_xmas(i, j):
+                count += 1
+
+    return count
+
+
+# Example grid
+grid = [
+    "MMMSXXMASM",
+    "MSAMXMSMSA",
+    "AMXSXMAAMM",
+    "MSAMASMSMX",
+    "XMASAMXAMM",
+    "XXAMMXXAMA",
+    "SMSMSASXSS",
+    "SAXAMASAAA",
+    "MAMMMXMMMM",
+    "MXMXAXMASX"
+]
+
+# Convert grid to a list of lists
+grid = [list(row) for row in grid]
+
+# Count occurrences of X-MAS shapes
+result = count_xmas_shapes(grid)
+print(f"The X-MAS shape appears {result} times in the grid.")
