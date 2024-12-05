@@ -1,70 +1,51 @@
-def parse_input(input_data):
-    # Dividir el input en reglas y actualizaciones
-    parts = input_data.strip().split("\n\n")
-    rules = [tuple(map(int, rule.split("|"))) for rule in parts[0].splitlines()]
-    updates = [list(map(int, update.split(","))) for update in parts[1].splitlines()]
-    return rules, updates
+from functools import cmp_to_key
 
-def is_update_valid(update, rules):
-    # Validar todas las reglas aplicables a esta actualización
-    for x, y in rules:
-        if x in update and y in update:
-            if update.index(x) > update.index(y):
-                print(f"Actualización inválida: {update} rompe la regla {x}|{y}")
-                return False
-    return True
+class Solution:
+    def part_one(self, input_data):
+        updates, comparer = self.parse(input_data)
+        return sum(
+            self.get_middle_page(pages) 
+            for pages in updates 
+            if self.sorted(pages, comparer)
+        )
 
-def find_middle_page(update):
-    # Ordenar la actualización y encontrar la página del medio
-    sorted_update = sorted(update)
-    middle_index = len(sorted_update) // 2
-    middle_page = sorted_update[middle_index]
-    print(f"Actualización válida: {update}, Ordenada: {sorted_update}, Página del medio: {middle_page}")
-    return middle_page
+    def part_two(self, input_data):
+        updates, comparer = self.parse(input_data)
+        return sum(
+            self.get_middle_page(sorted(pages, key=cmp_to_key(comparer)))
+            for pages in updates
+            if not self.sorted(pages, comparer)
+        )
 
-def calculate_sum_of_middle_pages(input_data):
-    rules, updates = parse_input(input_data)
-    valid_middle_pages = []
-    
-    for update in updates:
-        if is_update_valid(update, rules):
-            valid_middle_pages.append(find_middle_page(update))
-    
-    print(f"Páginas del medio válidas: {valid_middle_pages}")
-    return sum(valid_middle_pages)
+    def parse(self, input_data):
+        parts = input_data.strip().split("\n\n")
+        
+        # Part 1: Create ordering and comparer
+        ordering = set(parts[0].splitlines())
+        def comparer(p1, p2):
+            return -1 if f"{p1}|{p2}" in ordering else 1
 
-# Input de ejemplo
+        # Part 2: Parse updates
+        updates = [line.split(",") for line in parts[1].splitlines()]
+        return updates, comparer
+
+    def get_middle_page(self, pages):
+        return int(pages[len(pages) // 2])
+
+    def sorted(self, pages, comparer):
+        return pages == sorted(pages, key=cmp_to_key(comparer))
+
+
+# Ejemplo de uso:
 input_data = """\
-47|53
-97|13
-97|61
-97|47
-75|29
-61|13
-75|53
-29|13
-97|29
-53|29
-61|53
-97|53
-61|29
-47|13
-75|47
-97|75
-47|61
-75|61
-47|29
-75|13
-53|13
+A|B
+B|C
+A|C
 
-75,47,61,53,29
-97,61,53,29,13
-75,29,13
-75,97,47,61,53
-61,13,29
-97,13,75,29,47
-"""
+A,B,C
+C,B,A
+B,A,C"""
 
-# Ejecutar la función y mostrar el resultado
-result = calculate_sum_of_middle_pages(input_data)
-print(f"Suma de páginas del medio: {result}")
+solution = Solution()
+print("Part One:", solution.part_one(input_data))  # Resultado de la Parte 1
+print("Part Two:", solution.part_two(input_data))  # Resultado de la Parte 2
