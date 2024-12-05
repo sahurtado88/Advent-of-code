@@ -1,25 +1,25 @@
 def parse_input(input_data):
-    # Split the input into rules and updates
+    # Dividir el input en reglas y actualizaciones
     parts = input_data.strip().split("\n\n")
     rules = [tuple(map(int, rule.split("|"))) for rule in parts[0].splitlines()]
     updates = [list(map(int, update.split(","))) for update in parts[1].splitlines()]
     return rules, updates
 
 def is_update_valid(update, rules):
-    # Check all rules that are relevant to this update
+    # Validar todas las reglas aplicables a esta actualización
     for x, y in rules:
         if x in update and y in update:
             if update.index(x) > update.index(y):
-                print(f"Invalid: {update} breaks rule {x}|{y}")
+                print(f"Actualización inválida: {update} rompe la regla {x}|{y}")
                 return False
     return True
 
 def find_middle_page(update):
-    # Sort the update and find the middle page
+    # Ordenar la actualización y encontrar la página del medio
     sorted_update = sorted(update)
     middle_index = len(sorted_update) // 2
     middle_page = sorted_update[middle_index]
-    print(f"Valid Update: {update}, Sorted: {sorted_update}, Middle Page: {middle_page}")
+    print(f"Actualización válida: {update}, Ordenada: {sorted_update}, Página del medio: {middle_page}")
     return middle_page
 
 def calculate_sum_of_middle_pages(input_data):
@@ -30,10 +30,10 @@ def calculate_sum_of_middle_pages(input_data):
         if is_update_valid(update, rules):
             valid_middle_pages.append(find_middle_page(update))
     
-    print(f"Valid Middle Pages: {valid_middle_pages}")
+    print(f"Páginas del medio válidas: {valid_middle_pages}")
     return sum(valid_middle_pages)
 
-# Input data
+# Input de ejemplo
 input_data = """\
 47|53
 97|13
@@ -65,6 +65,6 @@ input_data = """\
 97,13,75,29,47
 """
 
-# Calculate the result
+# Ejecutar la función y mostrar el resultado
 result = calculate_sum_of_middle_pages(input_data)
-print(f"Sum of Middle Pages: {result}")
+print(f"Suma de páginas del medio: {result}")
