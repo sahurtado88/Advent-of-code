@@ -10,6 +10,7 @@ def is_update_valid(update, rules):
     for x, y in rules:
         if x in update and y in update:
             if update.index(x) > update.index(y):
+                print(f"Invalid: {update} breaks rule {x}|{y}")
                 return False
     return True
 
@@ -17,7 +18,9 @@ def find_middle_page(update):
     # Sort the update and find the middle page
     sorted_update = sorted(update)
     middle_index = len(sorted_update) // 2
-    return sorted_update[middle_index]
+    middle_page = sorted_update[middle_index]
+    print(f"Valid Update: {update}, Sorted: {sorted_update}, Middle Page: {middle_page}")
+    return middle_page
 
 def calculate_sum_of_middle_pages(input_data):
     rules, updates = parse_input(input_data)
@@ -27,6 +30,7 @@ def calculate_sum_of_middle_pages(input_data):
         if is_update_valid(update, rules):
             valid_middle_pages.append(find_middle_page(update))
     
+    print(f"Valid Middle Pages: {valid_middle_pages}")
     return sum(valid_middle_pages)
 
 # Input data
@@ -63,4 +67,4 @@ input_data = """\
 
 # Calculate the result
 result = calculate_sum_of_middle_pages(input_data)
-print(result)
+print(f"Sum of Middle Pages: {result}")
