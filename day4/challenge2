@@ -1,35 +1,69 @@
-# Cuadrícula proporcionada
-grid = [
-    ".M.S......",
-    "..A..MSMS.",
-    ".M.S.MAA..",
-    "..A.ASMSM.",
-    ".M.S.M....",
-    "..........",
-    "S.S.S.S.S.",
-    ".A.A.A.A..",
-    "M.M.M.M.M.",
-    ".........."
-]
+from collections import defaultdict
+from itertools import product
 
-# Función para verificar el patrón "X-MAS"
-def check_xmas(i, j):
-    return (
-        grid[i-1][j-1] == 'M' and  # Top-left
-        grid[i][j] == 'A' and      # Center
-        grid[i+1][j+1] == 'M' and  # Bottom-right
-        grid[i-1][j+1] == 'S' and  # Top-right
-        grid[i][j+1] == 'S' and    # Right
-        grid[i+1][j-1] == 'S'      # Bottom-left
-    )
+class Solution:
+    def __init__(self):
+        # Direcciones representadas como tuplas (dx, dy)
+        self.Up = (0, -1)
+        self.Down = (0, 1)
+        self.Left = (-1, 0)
+        self.Right = (1, 0)
+    
+    def part_one(self, input_data):
+        mat = self.get_map(input_data)
+        directions = [self.Right, (1, 1), (-1, 1), self.Down]
+        
+        count = sum(
+            1
+            for pt in mat
+            for dir in directions
+            if self.matches(mat, pt, dir, "XMAS")
+        )
+        return count
 
-# Contar cuántas veces aparece el patrón "X-MAS"
-count = 0
+    def part_two(self, input_data):
+        mat = self.get_map(input_data)
+        
+        count = sum(
+            1
+            for pt in mat
+            if self.matches(mat, (pt[0] - 1, pt[1] - 1), (1, 1), "MAS") and
+               self.matches(mat, (pt[0] + 1, pt[1] - 1), (-1, 1), "MAS")
+        )
+        return count
 
-# Recorremos la cuadrícula evitando los bordes
-for i in range(1, len(grid) - 1):
-    for j in range(1, len(grid[i]) - 1):
-        if grid[i][j] == 'A' and check_xmas(i, j):
-            count += 1
+    def matches(self, mat, start, direction, pattern):
+        """
+        Verifica si el patrón o su reverso puede leerse en una dirección dada
+        desde el punto de inicio.
+        """
+        chars = [
+            mat.get((start[0] + i * direction[0], start[1] + i * direction[1]), None)
+            for i in range(len(pattern))
+        ]
+        return chars == list(pattern) or chars == list(reversed(pattern))
 
-print("El patrón X-MAS aparece", count, "veces.")
+    def get_map(self, input_data):
+        """
+        Convierte la entrada en un diccionario donde las claves son coordenadas (x, y)
+        y los valores son los caracteres correspondientes.
+        """
+        mat = input_data.strip().split("\n")
+        return {
+            (x, y): mat[y][x]
+            for y in range(len(mat))
+            for x in range(len(mat[0]))
+        }
+
+
+# Ejemplo de uso
+if __name__ == "__main__":
+    input_data = """\
+XMASX
+MAXMA
+ASXMS
+SXMAM"""
+    
+    solution = Solution()
+    print("Parte 1:", solution.part_one(input_data))  # Conteo de "XMAS"
+    print("Parte 2:", solution.part_two(input_data))  # Conteo de "MAS"
