@@ -1,0 +1,66 @@
+def parse_input(input_data):
+    # Split the input into rules and updates
+    parts = input_data.strip().split("\n\n")
+    rules = [tuple(map(int, rule.split("|"))) for rule in parts[0].splitlines()]
+    updates = [list(map(int, update.split(","))) for update in parts[1].splitlines()]
+    return rules, updates
+
+def is_update_valid(update, rules):
+    # Check all rules that are relevant to this update
+    for x, y in rules:
+        if x in update and y in update:
+            if update.index(x) > update.index(y):
+                return False
+    return True
+
+def find_middle_page(update):
+    # Sort the update and find the middle page
+    sorted_update = sorted(update)
+    middle_index = len(sorted_update) // 2
+    return sorted_update[middle_index]
+
+def calculate_sum_of_middle_pages(input_data):
+    rules, updates = parse_input(input_data)
+    valid_middle_pages = []
+    
+    for update in updates:
+        if is_update_valid(update, rules):
+            valid_middle_pages.append(find_middle_page(update))
+    
+    return sum(valid_middle_pages)
+
+# Input data
+input_data = """\
+47|53
+97|13
+97|61
+97|47
+75|29
+61|13
+75|53
+29|13
+97|29
+53|29
+61|53
+97|53
+61|29
+47|13
+75|47
+97|75
+47|61
+75|61
+47|29
+75|13
+53|13
+
+75,47,61,53,29
+97,61,53,29,13
+75,29,13
+75,97,47,61,53
+61,13,29
+97,13,75,29,47
+"""
+
+# Calculate the result
+result = calculate_sum_of_middle_pages(input_data)
+print(result)
