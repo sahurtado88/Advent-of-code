@@ -1,0 +1,5 @@
+C:\Users\SAHurtado\Downloads\aoC\Advent-of-code\Day6\AdventOfCode\obj\Debug\net9.0\AdventOfCode.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SAHurtado\Downloads\aoC\Advent-of-code\Day6\AdventOfCode\obj\Debug\net9.0\AdventOfCode.AssemblyInfoInputs.cache
+C:\Users\SAHurtado\Downloads\aoC\Advent-of-code\Day6\AdventOfCode\obj\Debug\net9.0\AdventOfCode.AssemblyInfo.cs
+C:\Users\SAHurtado\Downloads\aoC\Advent-of-code\Day6\AdventOfCode\obj\Debug\net9.0\AdventOfCode.csproj.CoreCompileInputs.cache
+C:\Users\SAHurtado\Downloads\aoC\Advent-of-code\Day6\AdventOfCode\obj\Debug\net9.0\AdventOfCode.sourcelink.json

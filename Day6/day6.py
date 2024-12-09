@@ -14,35 +14,35 @@ def parse(input: str) -> Tuple[Map, complex]:
     Convierte la entrada de texto en un mapa y encuentra la posición inicial del guardia.
     """
     lines = input.split("\n")
-    map = {
+    mapa = {
         complex(x, -y): char
         for y in range(len(lines))
         for x in range(len(lines[0]))
         if (char := lines[y][x]) != ' '  # Filtra los espacios vacíos
     }
-    start = next(pos for pos, char in map.items() if char == '^')
-    return map, start
+    start = next(pos for pos, char in mapa.items() if char == '^')
+    return mapa, start
 
 
-def walk(map: Map, start: complex) -> Tuple[Set[complex], bool]:
+def walk(mapa: Map, start: complex) -> Tuple[Set[complex], bool]:
     """
     Simula el movimiento del guardia siguiendo las reglas dadas.
     Devuelve las posiciones visitadas y si el guardia entra en un ciclo.
     """
     seen = set()
-    dir = UP
+    dire = UP
     pos = start
 
-    while pos in map and (pos, dir) not in seen:
-        seen.add((pos, dir))
+    while pos in map and (pos, dire) not in seen:
+        seen.add((pos, dire))
         
-        if map.get(pos + dir, '.') == '#':
-            dir *= TURN_RIGHT  # Gira a la derecha
+        if map.get(pos + dire, '.') == '#':
+            dire *= TURN_RIGHT  # Gira a la derecha
         else:
-            pos += dir  # Avanza en la dirección actual
+            pos += dire  # Avanza en la dirección actual
     
     positions = {s[0] for s in seen}  # Extrae solo las posiciones visitadas
-    is_loop = (pos, dir) in seen
+    is_loop = (pos, dire) in seen
     return positions, is_loop
 
 
