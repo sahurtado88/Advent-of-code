@@ -51,3 +51,11 @@ class Solution:
         
         return map_, start
 
+if __name__ == "__main__":
+    with open("input.txt","r") as f:
+        input_data = f.read().strip()
+
+    solution= Solution()
+
+    print("one", solution.part_one(input_data))
+    print("two:", solution.part_one(input_data))
