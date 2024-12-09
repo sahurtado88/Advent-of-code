@@ -1,93 +1,76 @@
+from typing import Dict, Tuple, List, Set, Iterable
 from collections import defaultdict
-from typing import Dict, Tuple, List, Set
 
-# Alias para el tipo de mapa
-Map = Dict[complex, str]
+# Tipo alias para facilitar la comprensión
+Map = Dict[complex, str]  # Mapa de coordenadas (complejo) a caracteres
 
-# Direcciones
-UP = complex(0, 1)
-TURN_RIGHT = -1j  # Girar a la derecha es una rotación de -90 grados en el plano complejo
+class Solution:
+    def __init__(self):
+        self.Up = complex(0, 1)  # Equivalente a Complex.ImaginaryOne
+        self.TurnRight = -1j     # Equivalente a -Complex.ImaginaryOne
 
-
-def parse(input: str) -> Tuple[Map, complex]:
-    """
-    Convierte la entrada de texto en un mapa y encuentra la posición inicial del guardia.
-    """
-    lines = input.split("\n")
-    mapa = {
-        complex(x, -y): char
-        for y in range(len(lines))
-        for x in range(len(lines[0]))
-        if (char := lines[y][x]) != ' '  # Filtra los espacios vacíos
-    }
-    start = next(pos for pos, char in mapa.items() if char == '^')
-    return mapa, start
-
-
-def walk(mapa: Map, start: complex) -> Tuple[Set[complex], bool]:
-    """
-    Simula el movimiento del guardia siguiendo las reglas dadas.
-    Devuelve las posiciones visitadas y si el guardia entra en un ciclo.
-    """
-    seen = set()
-    dire = UP
-    pos = start
-
-    while pos in map and (pos, dire) not in seen:
-        seen.add((pos, dire))
+    def part_one(self, input: str) -> int:
+        """Calcula el número de posiciones visitadas en la parte uno."""
+        map_, start = self._parse(input)
+        positions, _ = self._walk(map_, start)
+        return len(positions)
+    
+    def part_two(self, input: str) -> int:
+        """Cuenta el número de ciclos formados en la parte dos."""
+        map_, start = self._parse(input)
+        positions, _ = self._walk(map_, start)
+        loops = 0
         
-        if map.get(pos + dire, '.') == '#':
-            dire *= TURN_RIGHT  # Gira a la derecha
-        else:
-            pos += dire  # Avanza en la dirección actual
-    
-    positions = {s[0] for s in seen}  # Extrae solo las posiciones visitadas
-    is_loop = (pos, dire) in seen
-    return positions, is_loop
-
-
-def part_one(input: str) -> int:
-    """
-    Calcula la cantidad de posiciones únicas visitadas por el guardia antes de salir del mapa.
-    """
-    map, start = parse(input)
-    positions, _ = walk(map, start)
-    return len(positions)
-
-
-def part_two(input: str) -> int:
-    """
-    Calcula la cantidad de bucles que ocurren al colocar un obstáculo en cada posición visitada por el guardia.
-    """
-    map, start = parse(input)
-    positions, _ = walk(map, start)
-    loops = 0
-    
-    for block in positions:
-        if map.get(block, '.') == '.':  # Asegurarse de que sea un espacio libre
-            map[block] = '#'
-            _, is_loop = walk(map, start)
+        # Intentar bloquear cada posición que sea un '.' y verificar si se forma un ciclo
+        for block in [pos for pos in positions if map_[pos] == '.']:
+            map_[block] = '#'
+            _, is_loop = self._walk(map_, start)
             if is_loop:
                 loops += 1
-            map[block] = '.'  # Restaurar la posición original
-    
-    return loops
+            map_[block] = '.'  # Restaurar el mapa original
+        return loops
 
+    def _walk(self, map_: Map, pos: complex) -> Tuple[Set[complex], bool]:
+        """Simula el movimiento del guardia desde la posición inicial."""
+        seen = set()
+        dir_ = self.Up
+        
+        while pos in map_ and (pos, dir_) not in seen:
+            seen.add((pos, dir_))
+            
+            if map_.get(pos + dir_, '#') == '#':  # Gira a la derecha si hay una pared
+                dir_ *= self.TurnRight
+            else:
+                pos += dir_  # Mover en la dirección actual
 
+        # Retorna las posiciones distintas que el guardia visitó y si se detectó un ciclo
+        positions = {pos_dir[0] for pos_dir in seen}
+        is_loop = (pos, dir_) in seen
+        return positions, is_loop
+
+    def _parse(self, input: str) -> Tuple[Map, complex]:
+        """Parsea la entrada en un mapa de caracteres y la posición de inicio."""
+        lines = input.split("\n")
+        
+        map_ = {
+            complex(x, -y): char
+            for y in range(len(lines))
+            for x in range(len(lines[y]))
+            for char in [lines[y][x]]
+        }
+        
+        start = next(pos for pos, char in map_.items() if char == '^')
+        
+        return map_, start
+
+# Ejemplo de uso
 if __name__ == "__main__":
-    # Entrada de ejemplo
-    input_data = """\
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#..^.....
-........#.
-#.........
-......#...
-"""
+    input_data = """#####
+#...#
+#.^.#
+#...#
+#####"""
     
-    print("Parte 1 (Posiciones únicas visitadas):", part_one(input_data))
-    print("Parte 2 (Número de bucles encontrados):", part_two(input_data))
+    solution = Solution()
+    print("Part One:", solution.part_one(input_data))  # Calcula el número de posiciones visitadas
+    print("Part Two:", solution.part_two(input_data))  # Calcula el número de ciclos detectados
