@@ -1,54 +1,82 @@
-class AdventOfCodeY2024Day05:
+from collections import defaultdict
+from typing import Dict, Tuple, List, Set
 
-    @staticmethod
-    def part_one(input: str) -> int:
-        updates, comparer = AdventOfCodeY2024Day05.parse(input)
-        return sum(
-            AdventOfCodeY2024Day05.get_middle_page(pages)
-            for pages in updates
-            if AdventOfCodeY2024Day05.sorted_pages(pages, comparer)
-        )
+# Alias para el tipo de mapa
+Map = Dict[complex, str]
 
-    @staticmethod
-    def part_two(input: str) -> int:
-        updates, comparer = AdventOfCodeY2024Day05.parse(input)
-        return sum(
-            AdventOfCodeY2024Day05.get_middle_page(
-                sorted(pages, key=cmp_to_key(comparer))
-            )
-            for pages in updates
-            if not AdventOfCodeY2024Day05.sorted_pages(pages, comparer)
-        )
+# Direcciones
+UP = complex(0, 1)
+TURN_RIGHT = -1j  # Girar a la derecha es una rotación de -90 grados en el plano complejo
 
-    @staticmethod
-    def parse(input: str) -> Tuple[List[List[str]], callable]:
-        grid = input.strip().split("\n")
+
+def parse(input: str) -> Tuple[Map, complex]:
+    """
+    Convierte la entrada de texto en un mapa y encuentra la posición inicial del guardia.
+    """
+    lines = input.split("\n")
+    map = {
+        complex(x, -y): char
+        for y in range(len(lines))
+        for x in range(len(lines[0]))
+        if (char := lines[y][x]) != ' '  # Filtra los espacios vacíos
+    }
+    start = next(pos for pos, char in map.items() if char == '^')
+    return map, start
+
+
+def walk(map: Map, start: complex) -> Tuple[Set[complex], bool]:
+    """
+    Simula el movimiento del guardia siguiendo las reglas dadas.
+    Devuelve las posiciones visitadas y si el guardia entra en un ciclo.
+    """
+    seen = set()
+    dir = UP
+    pos = start
+
+    while pos in map and (pos, dir) not in seen:
+        seen.add((pos, dir))
         
-        # Crear un conjunto para representar alguna relación de orden (ajustar según el problema)
-        ordering = set()
-        for row in range(len(grid)):
-            for col in range(len(grid[row])):
-                if grid[row][col] == "#":
-                    ordering.add(f"{row},{col}")
-
-        def comparer(p1, p2):
-            return -1 if f"{p1}|{p2}" in ordering else 1
-
-        updates = [list(row) for row in grid]
-        return updates, comparer
-
-    @staticmethod
-    def get_middle_page(nums: List[str]) -> int:
-        # Asume que `nums` es un listado de caracteres de la fila del mapa, ajustar si es necesario
-        return len(nums) // 2
-
-    @staticmethod
-    def sorted_pages(pages: List[str], comparer: callable) -> bool:
-        return pages == sorted(pages, key=cmp_to_key(comparer))
+        if map.get(pos + dir, '.') == '#':
+            dir *= TURN_RIGHT  # Gira a la derecha
+        else:
+            pos += dir  # Avanza en la dirección actual
+    
+    positions = {s[0] for s in seen}  # Extrae solo las posiciones visitadas
+    is_loop = (pos, dir) in seen
+    return positions, is_loop
 
 
-# Ejemplo de uso con la entrada proporcionada
-input_data = """\
+def part_one(input: str) -> int:
+    """
+    Calcula la cantidad de posiciones únicas visitadas por el guardia antes de salir del mapa.
+    """
+    map, start = parse(input)
+    positions, _ = walk(map, start)
+    return len(positions)
+
+
+def part_two(input: str) -> int:
+    """
+    Calcula la cantidad de bucles que ocurren al colocar un obstáculo en cada posición visitada por el guardia.
+    """
+    map, start = parse(input)
+    positions, _ = walk(map, start)
+    loops = 0
+    
+    for block in positions:
+        if map.get(block, '.') == '.':  # Asegurarse de que sea un espacio libre
+            map[block] = '#'
+            _, is_loop = walk(map, start)
+            if is_loop:
+                loops += 1
+            map[block] = '.'  # Restaurar la posición original
+    
+    return loops
+
+
+if __name__ == "__main__":
+    # Entrada de ejemplo
+    input_data = """\
 ....#.....
 .........#
 ..........
@@ -60,7 +88,6 @@ input_data = """\
 #.........
 ......#...
 """
-
-solution = AdventOfCodeY2024Day05
-print("Part One:", solution.part_one(input_data))  # Ajustar lógica según el propósito
-print("Part Two:", solution.part_two(input_data))  # Ajustar lógica según el propósito
+    
+    print("Parte 1 (Posiciones únicas visitadas):", part_one(input_data))
+    print("Parte 2 (Número de bucles encontrados):", part_two(input_data))
