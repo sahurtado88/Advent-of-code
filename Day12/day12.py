@@ -1,90 +1,70 @@
-from collections import defaultdict, deque
-from typing import Dict, Set, Tuple
+import sys
+import re
+import heapq
+from collections import defaultdict, Counter, deque
+import pyperclip as pc
+def pr(s):
+    print(s)
+    pc.copy(s)
+sys.setrecursionlimit(10**6)
+DIRS = [(-1,0),(0,1),(1,0),(0,-1)] # up right down left
+infile = sys.argv[1] if len(sys.argv)>=2 else '12.in'
+p1 = 0
+p2 = 0
+D = open(infile).read().strip()
 
-# Aliases for clarity
-Region = Set[complex]
+G = D.split('\n')
+R = len(G)
+C = len(G[0])
 
-class Solution:
-    
-    UP = complex(0, 1)    # Equivalent to Complex.ImaginaryOne
-    DOWN = complex(0, -1) # Equivalent to -Complex.ImaginaryOne
-    LEFT = complex(-1, 0) # Equivalent to -1
-    RIGHT = complex(1, 0) # Equivalent to 1
+SEEN = set()
+for r in range(R):
+    for c in range(C):
+        if (r,c) in SEEN:
+            continue
+        Q = deque([(r,c)])
+        area = 0
+        perim = 0
+        PERIM = dict()
+        while Q:
+            r2,c2 = Q.popleft()
+            if (r2,c2) in SEEN:
+                continue
+            SEEN.add((r2,c2))
+            area += 1
+            for dr,dc in DIRS:
+                rr = r2+dr
+                cc = c2+dc
+                if 0<=rr<R and 0<=cc<C and G[rr][cc]==G[r2][c2]:
+                    Q.append((rr,cc))
+                else:
+                    perim += 1
+                    if (dr,dc) not in PERIM:
+                        PERIM[(dr,dc)] = set()
+                    # side = same direction, adjacent
+                    PERIM[(dr,dc)].add((r2,c2))
 
-    def part_one(self, input: str) -> int:
-        return self.calculate_fence_price(input, self.find_edges)
+        sides = 0
+        for k,vs in PERIM.items():
+            SEEN_PERIM = set()
+            old_sides = sides
+            for (pr,pc) in vs:
+                if (pr,pc) not in SEEN_PERIM:
+                    sides += 1
+                    Q = deque([(pr,pc)])
+                    while Q:
+                        r2,c2 = Q.popleft()
+                        if (r2,c2) in SEEN_PERIM:
+                            continue
+                        SEEN_PERIM.add((r2,c2))
+                        for dr,dc in DIRS:
+                            rr,cc = r2+dr,c2+dc
+                            if (rr,cc) in vs:
+                                Q.append((rr,cc))
 
-    def part_two(self, input: str) -> int:
-        return self.calculate_fence_price(input, self.find_corners)
+        p1 += area*perim
+        p2 += area*sides
 
-    def calculate_fence_price(self, input: str, measure) -> int:
-        """Calculate the total fence price based on the region perimeter."""
-        regions = self.get_regions(input)
-        total_price = 0
-        for region in set(regions.values()):  # Get distinct regions
-            perimeter = 0
-            for point in region:
-                perimeter += measure(regions, point)
-            total_price += len(region) * perimeter
-        return total_price
 
-    def find_edges(self, map: Dict[complex, Region], point: complex) -> int:
-        """Finds the number of edges for a given point in a region."""
-        perimeter = 0
-        region = map[point]
-        for direction in [self.RIGHT, self.DOWN, self.LEFT, self.UP]:
-            if map.get(point + direction) != region:
-                perimeter += 1
-        return perimeter
-
-    def find_corners(self, map: Dict[complex, Region], point: complex) -> int:
-        """Finds the number of corners for a given point in a region."""
-        corners = 0
-        region = map[point]
-        
-        for du, dv in [(self.UP, self.RIGHT), (self.RIGHT, self.DOWN), (self.DOWN, self.LEFT), (self.LEFT, self.UP)]:
-            # Check for the first type of corner
-            if map.get(point + du) != region and map.get(point + dv) != region:
-                corners += 1
-            
-            # Check for the second type of corner
-            if map.get(point + du) == region and \
-               map.get(point + dv) == region and \
-               map.get(point + du + dv) != region:
-                corners += 1
-        
-        return corners
-
-    def get_regions(self, input: str) -> Dict[complex, Region]:
-        """Maps the positions of plants in a garden to their corresponding regions."""
-        lines = input.split("\n")
-        garden = {x + y * self.DOWN: char for y, row in enumerate(lines) for x, char in enumerate(row)}
-        
-        positions = set(garden.keys())
-        regions = {}
-        
-        while positions:
-            pivot = positions.pop()  # Pick a starting point
-            region = {pivot}  # Create a new region
-            queue = deque([pivot])  # Flood-fill queue
-            plant = garden[pivot]  # Type of plant at pivot position
-            
-            while queue:
-                point = queue.popleft()
-                regions[point] = region
-                
-                for direction in [self.UP, self.DOWN, self.LEFT, self.RIGHT]:
-                    neighbor = point + direction
-                    if neighbor in positions and garden.get(neighbor) == plant:
-                        region.add(neighbor)
-                        queue.append(neighbor)
-                        positions.remove(neighbor)
-        
-        return regions
-
-# Example usage
-if __name__ == "__main__":
-    solution = Solution()
-    input_data = "....\n.##.\n.##.\n...."  # Example input
-    print("Part One:", solution.part_one(input_data))
-    print("Part Two:", solution.part_two(input_data))
+print(p1)
+print(p2)
