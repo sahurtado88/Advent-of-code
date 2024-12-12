@@ -8,7 +8,7 @@ def pr(s):
     pc.copy(s)
 sys.setrecursionlimit(10**6)
 DIRS = [(-1,0),(0,1),(1,0),(0,-1)] # up right down left
-infile = sys.argv[1] if len(sys.argv)>=2 else '12.in'
+infile = sys.argv[1] if len(sys.argv)>=2 else 'data.in'
 p1 = 0
 p2 = 0
 D = open(infile).read().strip()
