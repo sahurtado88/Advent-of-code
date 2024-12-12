@@ -45,6 +45,6 @@ class Solution:
 # Example usage
 if __name__ == "__main__":
     solution = Solution()
-    input_data = "123 456 789"  # Example input
+    input_data = "6571 0 5851763 526746 23 69822 9 989"  # Example input
     print("Part One:", solution.part_one(input_data))
     print("Part Two:", solution.part_two(input_data))
