@@ -1,62 +1,84 @@
+import sys
 import re
-from typing import List, Tuple, Generator
+import heapq
+from collections import defaultdict, Counter, deque
+import pyperclip as pc
+import numpy as np
+def pr(s):
+    print(s)
+    pc.copy(s)
+sys.setrecursionlimit(10**6)
+DIRS = [(-1,0),(0,1),(1,0),(0,-1)] # up right down left
+infile = sys.argv[1] if len(sys.argv)>=2 else '13.in'
+p1 = 0
+p2 = 0
+D = open(infile).read().strip()
 
-class Vec2:
-    """Representa un vector 2D con coordenadas x e y."""
-    def __init__(self, x: int, y: int):
-        self.x = x
-        self.y = y
+# cost 3 to press A, 1 to press B
+def solve(ax,ay,bx,by,px,py,part2):
+    P2 = 10000000000000 if part2 else 0
+    #A = [[ax,bx],[ay,by]]
+    #B = [px+P2, py+P2]
+    #x = np.linalg.solve(A,B)
+    #t1 = int(x[0])
+    #t2 = int(x[1])
+    #print(ax*t1 + bx*t2 - (px+P2))
+    #print(ay*t1 + by*t2 - (py+P2))
+    #print(A,B,x)
+    #assert False
+    #return 3*t1 + t2
+    best = None
+    for t1 in range(600):
+        for t2 in range(600):
+            cost = 3*t1 + t2
+            dx = ax*t1 + bx*t2
+            dy = ay*t1 + by*t2
+            if dx==dy and dx>0:
+                score = dx/cost
+                if best is None or score < best[0]:
+                    best = (score, t1, t2, cost, dx)
+    if best is None:
+        return 0
+    _score, t1, t2, cost, dx = best
+    amt = (P2 - 40000) // dx
 
-    def __repr__(self):
-        return f"Vec2(x={self.x}, y={self.y})"
-
-
-class Solution:
-    """Solución para el problema 'Claw Contraption'."""
-
-    def part_one(self, input: str) -> int:
-        """Resuelve la Parte 1 del problema."""
-        return sum(self.get_prize(machine) for machine in self.parse(input))
-
-    def part_two(self, input: str) -> int:
-        """Resuelve la Parte 2 del problema con un desplazamiento (shift) aplicado."""
-        return sum(self.get_prize(machine) for machine in self.parse(input, shift=10_000_000_000_000))
-
-    def get_prize(self, machine: Tuple[Vec2, Vec2, Vec2]) -> int:
-        """Calcula el premio basado en la solución del sistema de ecuaciones."""
-        a, b, p = machine
-
-        # Resuelve a * i + b * j = p para i y j usando la regla de Cramer
-        i = self.det(p, b) // self.det(a, b)  # División entera
-        j = self.det(a, p) // self.det(a, b)  # División entera
-
-        # Devuelve el premio cuando se encuentra una solución entera no negativa
-        if i >= 0 and j >= 0 and a.x * i + b.x * j == p.x and a.y * i + b.y * j == p.y:
-            return 3 * i + j
-        else:
+    DP = {}
+    def f(x,y):
+        """What is the minimum cost of getting to (x,y)?"""
+        if (x,y) in DP:
+            return DP[(x,y)]
+        if x==0 and y==0:
             return 0
+        if x<0:
+            return 10**20
+        if y<0:
+            return 10**20
+        ans = min(3+f(x-ax,y-ay), 1+f(x-bx,y-by))
+        DP[(x,y)] = ans
+        return ans
+    ans = f(px + P2 - amt*dx, py + P2 - amt*dx)
+    if ans < 10**15:
+        return ans + amt*cost
+    else:
+        return 0
 
-    def det(self, a: Vec2, b: Vec2) -> int:
-        """Calcula el determinante de dos vectores 2D."""
-        return a.x * b.y - a.y * b.x
+solved = 0
+machines = D.split('\n\n')
+for i,machine in enumerate(machines):
+    a,b,prize = machine.split('\n')
+    #['Button', 'A:', 'X+49,', 'Y+27']
+    aw = a.split()
+    ax = int(aw[2].split('+')[1].split(',')[0])
+    ay = int(aw[3].split('+')[1].split(',')[0])
+    bw = b.split()
+    bx = int(bw[2].split('+')[1].split(',')[0])
+    by = int(bw[3].split('+')[1].split(',')[0])
+    pw = prize.split()
+    px = int(pw[1].split('=')[1].split(',')[0])
+    py = int(pw[2].split('=')[1])
+    p1 += solve(ax,ay,bx,by,px,py, False)
+    p2 += solve(ax,ay,bx,by,px,py, True)
+    print(i, len(machines), prize, p1, p2)
 
-    def parse(self, input: str, shift: int = 0) -> Generator[Tuple[Vec2, Vec2, Vec2], None, None]:
-        """Parsea el input para producir una lista de 'máquinas' representadas por tuplas de tres vectores 2D."""
-        blocks = input.split("\n\n")
-        for block in blocks:
-            nums = [int(num) for num in re.findall(r"\d+", block)]
-            
-            # Agrupa los números en pares y crea objetos Vec2
-            vecs = [Vec2(nums[i], nums[i + 1]) for i in range(0, len(nums), 2)]
-            
-            # Aplica el desplazamiento al tercer vector
-            vecs[2] = Vec2(vecs[2].x + shift, vecs[2].y + shift)
-            yield (vecs[0], vecs[1], vecs[2])
-
-
-# Ejemplo de uso
-if __name__ == "__main__":
-    input_data = """1, 2\n3, 4\n5, 6\n\n7, 8\n9, 10\n11, 12"""
-    solution = Solution()
-    print("Parte 1:", solution.part_one(input_data))
-    print("Parte 2:", solution.part_two(input_data))
+pr(p1)
+pr(p2)
